@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import '../models/project.dart';
 import '../models/transaction.dart';
+import '../services/project_storage.dart';
 import '../widgets/transaction_tile.dart';
 
 class BilanFinancierScreen extends StatefulWidget {
   final Project project;
+  final void Function(Project updatedProject)? onProjectUpdated;
 
   const BilanFinancierScreen({
     super.key,
     required this.project,
+    this.onProjectUpdated,
   });
 
   @override
@@ -18,7 +21,6 @@ class BilanFinancierScreen extends StatefulWidget {
 
 class _BilanFinancierScreenState
     extends State<BilanFinancierScreen> {
-
   void _addTransaction() {
     _showTransactionDialog();
   }
@@ -33,6 +35,7 @@ class _BilanFinancierScreenState
         (t) => t.id == transaction.id,
       );
     });
+    widget.onProjectUpdated?.call(widget.project);
   }
 
   void _showTransactionDialog({
@@ -111,6 +114,7 @@ class _BilanFinancierScreenState
                   }
                 });
 
+                widget.onProjectUpdated?.call(widget.project);
                 Navigator.pop(context);
               },
               child: const Text('Enregistrer'),
@@ -137,7 +141,7 @@ class _BilanFinancierScreenState
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.blue,
+              color: const Color(0xFFCC9900),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -145,7 +149,7 @@ class _BilanFinancierScreenState
                 const Text(
                   'Total dépenses',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color.fromARGB(255,29,28,24),
                     fontSize: 16,
                   ),
                 ),

@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Gestion de projets',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
+          seedColor: const Color(0xFFCC9900),
         ),
         useMaterial3: true,
       ),

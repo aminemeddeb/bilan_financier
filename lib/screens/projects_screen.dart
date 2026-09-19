@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/project.dart';
 import '../models/transaction.dart';
+import '../services/project_storage.dart';
 import '../widgets/project_card.dart';
 import 'bilan_financier_screen.dart';
 
@@ -12,30 +13,30 @@ class ProjectsScreen extends StatefulWidget {
 }
 
 class _ProjectsScreenState extends State<ProjectsScreen> {
-  final List<Project> projects = [/*
-    Project(
-      id: '1',
-      name: 'Projet Maison',
-      transactions: [
-        Transaction(
-          id: '1',
-          description: 'Achat matériaux',
-          amount: 1200,
-          date: DateTime.now(),
-        ),
-        Transaction(
-          id: '2',
-          description: 'Main d’œuvre',
-          amount: 800,
-          date: DateTime.now(),
-        ),
-      ],
-    ),
-    Project(
-      id: '2',
-      name: 'Projet Bureau',
-    ),*/
-  ];
+  final ProjectStorage _storage = ProjectStorage();
+  final List<Project> projects = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProjects();
+  }
+
+  Future<void> _loadProjects() async {
+    final storedProjects = await _storage.loadProjects();
+
+    if (!mounted) return;
+
+    setState(() {
+      projects
+        ..clear()
+        ..addAll(storedProjects);
+    });
+  }
+
+  Future<void> _saveProjects() async {
+    await _storage.saveProjects(projects);
+  }
 
   void _addProject() {
     final controller = TextEditingController();
@@ -69,6 +70,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   );
                 });
 
+                _saveProjects();
                 Navigator.pop(context);
               },
               child: const Text('Ajouter'),
@@ -99,11 +101,21 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 MaterialPageRoute(
                   builder: (_) => BilanFinancierScreen(
                     project: project,
+                    onProjectUpdated: (updatedProject) {
+                      setState(() {
+                        final index = projects.indexWhere(
+                          (candidate) => candidate.id == updatedProject.id,
+                        );
+
+                        if (index != -1) {
+                          projects[index] = updatedProject;
+                        }
+                      });
+                      _saveProjects();
+                    },
                   ),
                 ),
-              ).then((_) {
-                setState(() {});
-              });
+              );
             },
           );
         },
